@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import re
 import os
 import json
 import tqdm
@@ -12,6 +13,7 @@ import requests
 API_URL = os.getenv('BS_URL', '')
 CLIENT_ID = os.getenv('BS_TOKEN_ID', '')
 CLIENT_SECRET = os.getenv('BS_TOKEN_SECRET', '')
+FILENAME_PATTERN = re.compile(r'[^a-zA-Z0-9 ]')
 
 
 # API Request functions
@@ -62,6 +64,7 @@ def export_book(book_id: str, book_title: str = None):
         filename = book_title
     else:
         filename = get_book_by_slug(book_id)['slug']
+    filename = FILENAME_PATTERN.sub('', filename)
     with open(f'{os.path.join(out_dir, f"{filename}.pdf")}', 'wb') as f:
         f.write(response.content)
 
@@ -75,6 +78,7 @@ def export_page(page_id: str, page_title: str = None):
         filename = f"{page_title}.pdf"
     else:
         filename = f"{page_id}.pdf"
+    filename = FILENAME_PATTERN.sub('', filename)
     with open(f'{os.path.join(out_dir, filename)}', 'wb') as f:
         f.write(response.content)
 
